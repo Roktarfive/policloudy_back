@@ -16,6 +16,7 @@ from app.routers import (
     radiacion,
     resumen_diario,
     resumen_global,
+    analisis,
 )
 
 app = FastAPI(
@@ -25,7 +26,7 @@ app = FastAPI(
         "El dashboard sube el CSV con **POST /upload-csv** y luego consulta "
         "los datos con los endpoints GET. Construida con FastAPI + Pandas."
     ),
-    version="2.1.0",
+    version="2.2.0",
     contact={"name": "Poliema", "email": "contacto@poliema.edu"},
 )
 
@@ -51,6 +52,9 @@ app.include_router(radiacion.router)
 # Resúmenes estadísticos
 app.include_router(resumen_diario.router)
 app.include_router(resumen_global.router)
+
+# Cálculo diferencial
+app.include_router(analisis.router)
 
 
 @app.get("/", tags=["Estado"], summary="Health-check")

@@ -202,3 +202,66 @@ class ResumenGlobalResponse(BaseModel):
     radiacion_solar:       EstadisticaVariable
     indice_uv:             EstadisticaVariable
     dosis_uv:              EstadisticaVariable
+
+
+# ─── Cálculo Diferencial ──────────────────────────────────────────────────────
+
+class PuntoDerivada(BaseModel):
+    """Un punto de la serie de derivada numérica."""
+    datetime: str
+    valor:    Optional[float] = None   # valor original y
+    dy_dt:    Optional[float] = None   # dy/dt [unidad/hora]
+
+
+class PuntoCritico(BaseModel):
+    """Punto donde la derivada cambia de signo."""
+    datetime:         str
+    valor:            Optional[float] = None
+    tipo:             str               # maximo_local | minimo_local | inflexion
+    derivada_antes:   Optional[float] = None
+    derivada_despues: Optional[float] = None
+
+
+class ExtremoGlobal(BaseModel):
+    datetime: str
+    valor:    Optional[float] = None
+
+
+class ExtremosResult(BaseModel):
+    maximo_global:   Optional[ExtremoGlobal] = None
+    minimo_global:   Optional[ExtremoGlobal] = None
+    maximos_locales: list[ExtremoGlobal] = []
+    minimos_locales: list[ExtremoGlobal] = []
+
+
+class RegresionLineal(BaseModel):
+    pendiente:               Optional[float] = None   # [unidad/hora]
+    intercepto:              Optional[float] = None
+    r_cuadrado:              Optional[float] = None   # 0–1
+    tendencia:               Optional[str]   = None   # creciente | decreciente | estable
+    prediccion_proxima_hora: Optional[float] = None
+    ecuacion:                Optional[str]   = None
+
+
+class AnalisisVariableResponse(BaseModel):
+    """Respuesta completa del análisis diferencial de una variable."""
+    variable:        str
+    n_registros:     int
+    derivada:        list[PuntoDerivada]
+    puntos_criticos: list[PuntoCritico]
+    extremos:        ExtremosResult
+    regresion:       RegresionLineal
+
+
+class AnalisisCompletoResponse(BaseModel):
+    """Análisis diferencial de todas las variables en un rango de fechas."""
+    fecha_inicio:      str
+    fecha_fin:         str
+    n_registros:       int
+    barometro:         AnalisisVariableResponse
+    temperatura:       AnalisisVariableResponse
+    humedad:           AnalisisVariableResponse
+    viento_velocidad:  AnalisisVariableResponse
+    lluvia:            AnalisisVariableResponse
+    radiacion_solar:   AnalisisVariableResponse
+    indice_uv:         AnalisisVariableResponse
